@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="az">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Detalları</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)); }
+  </style>
+</head>
+
+<body class="bg-gray-900 text-gray-200 min-h-screen flex">
+  <!-- Sidebar -->
+  <aside class="w-72 bg-gray-800 border-r border-gray-700 p-6 hidden md:block">
+    <div class="flex items-center gap-3 mb-8">
+      <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 .943.657 1.722 1.529 1.93l1.764.44a2 2 0 01.707 3.502l-1.646 1.177a1.993 1.993 0 01-2.206.063l-1.636-.982a1.993 1.993 0 01-.95-1.707V12m0-1V9a2 2 0 012-2h0a2 2 0 012 2v2" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold text-white">SIEM Platforma</h3>
+        <p class="text-sm text-gray-400">Korporativ Görünüş</p>
+      </div>
+    </div>
+
+    <nav class="space-y-1 text-sm">
+      <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors">Dashboard</a>
+      <a href="agents.html" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors">Agentlər</a>
+      <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors">İnsidentlər</a>
+      <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors">Hesabatlar</a>
+      <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors">Ayarlar</a>
+    </nav>
+
+    <div class="mt-8 text-sm text-gray-400">
+      <p>© 2025 SIEM</p>
+      <p class="mt-2">Bütün hüquqlar qorunur.</p>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <div class="flex-1 p-6 overflow-auto">
+    <header class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-extrabold text-white">Agent Detalları</h1>
+      <button id="anomalyBtn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md text-white font-medium">Anomalies</button>
+    </header>
+
+    <section id="agentInfo" class="bg-gray-800 rounded-2xl p-6 shadow-lg card mb-6">
+      <h2 class="text-xl font-semibold text-white mb-4">Agent Məlumatları</h2>
+      <div id="agentDetails" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-300">
+        <p>Yüklənir...</p>
+      </div>
+    </section>
+
+    <section id="agentProcesses" class="bg-gray-800 rounded-2xl p-6 shadow-lg card mb-6">
+      <h2 class="text-xl font-semibold text-white mb-4">Proseslər</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-gray-800 rounded-2xl overflow-hidden">
+          <thead class="bg-gray-700 text-gray-200">
+            <tr>
+              <th class="py-3 px-4 text-left text-sm font-semibold">PID</th>
+              <th class="py-3 px-4 text-left text-sm font-semibold">Ad</th>
+              <th class="py-3 px-4 text-left text-sm font-semibold">User</th>
+              <th class="py-3 px-4 text-left text-sm font-semibold">Status</th>
+            </tr>
+          </thead>
+          <tbody id="processTableBody" class="divide-y divide-gray-700"></tbody>
+        </table>
+      </div>
+      <div id="pagination" class="flex justify-center items-center gap-2 mt-4"></div>
+    </section>
+
+    <!-- Modal for anomalies -->
+    <div id="anomalyModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
+      <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg p-6 relative text-gray-200">
+        <button id="closeAnomalyModal" class="absolute top-3 right-3 text-gray-400 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <h2 class="text-xl font-bold mb-4">Anomaliyalar</h2>
+        <ul id="anomalyList" class="space-y-3 text-sm text-gray-300">
+          <li>Heç bir anomaliya yoxdur.</li>
+        </ul>
+      </div>
+    </div>
+
+    <footer class="text-xs text-gray-500 mt-8">© 2025 SIEM. Bütün hüquqlar qorunur.</footer>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const agentId = urlParams.get('id');
+
+    const agentDetailsElem = document.getElementById('agentDetails');
+    const processTableBody = document.getElementById('processTableBody');
+    const paginationElem = document.getElementById('pagination');
+
+    const anomalyBtn = document.getElementById('anomalyBtn');
+    const anomalyModal = document.getElementById('anomalyModal');
+    const closeAnomalyModal = document.getElementById('closeAnomalyModal');
+    const anomalyList = document.getElementById('anomalyList');
+
+    let processes = [];
+    let currentPage = 1;
+    const pageSize = 10;
+
+    async function fetchAgentDetails() {
+      try {
+        const res = await fetch(`http://127.0.0.1:5000/api/agents/${agentId}`);
+        const data = await res.json();
+
+        agentDetailsElem.innerHTML = `
+          <p><strong>ID:</strong> ${data._id}</p>
+          <p><strong>Ad:</strong> ${data.name}</p>
+          <p><strong>ƏS:</strong> ${data.os}</p>
+          <p><strong>IP Ünvanı:</strong> ${data.ipAddress}</p>
+          <p><strong>Status:</strong> ${data.status}</p>
+          <p><strong>Versiya:</strong> ${data.version}</p>
+          <p><strong>Son Görülmə:</strong> ${new Date(data.lastSeen).toLocaleString()}</p>
+        `;
+
+        processes = data.agentDataHistory?.[0]?.processData || [];
+        renderProcesses();
+      } catch (err) {
+        console.error('Agent detalları yüklənmədi:', err);
+      }
+    }
+
+    function renderProcesses() {
+      processTableBody.innerHTML = '';
+      const start = (currentPage - 1) * pageSize;
+      const paginated = processes.slice(start, start + pageSize);
+
+      if (paginated.length === 0) {
+        processTableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400">Proses yoxdur.</td></tr>`;
+      } else {
+        paginated.forEach(p => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="py-3 px-4 text-sm">${p.pid}</td>
+            <td class="py-3 px-4 text-sm">${p.name}</td>
+            <td class="py-3 px-4 text-sm">${p.username}</td>
+            <td class="py-3 px-4 text-sm">${p.status}</td>
+          `;
+          processTableBody.appendChild(row);
+        });
+      }
+      renderPagination();
+    }
+
+    function renderPagination() {
+      paginationElem.innerHTML = '';
+      const totalPages = Math.ceil(processes.length / pageSize);
+      if (totalPages <= 1) return;
+
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = 'Previous';
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.className = 'px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 disabled:opacity-50';
+      prevBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderProcesses(); } });
+      paginationElem.appendChild(prevBtn);
+
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 1) {
+          const btn = document.createElement('button');
+          btn.textContent = i;
+          btn.className = `px-3 py-1 rounded-md ${i === currentPage ? 'bg-indigo-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`;
+          btn.addEventListener('click', () => { currentPage = i; renderProcesses(); });
+          paginationElem.appendChild(btn);
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+          const span = document.createElement('span');
+          span.textContent = '...';
+          paginationElem.appendChild(span);
+        }
+      }
+
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = 'Next';
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.className = 'px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 disabled:opacity-50';
+      nextBtn.addEventListener('click', () => { if (currentPage < totalPages) { currentPage++; renderProcesses(); } });
+      paginationElem.appendChild(nextBtn);
+    }
+
+    anomalyBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/agents/${agentId}/anomaly/processes`);
+        const data = await res.json();
+
+        anomalyList.innerHTML = '';
+        if (!data.anomalies || data.anomalies.length === 0) {
+          anomalyList.innerHTML = '<li>Heç bir anomaliya tapılmadı.</li>';
+        } else {
+          data.anomalies.forEach(a => {
+            const li = document.createElement('li');
+            li.className = 'p-3 bg-gray-700 rounded-md';
+            li.innerHTML = `<strong>${a.type}</strong>: ${a.message} (Threshold: ${a.threshold}, Value: ${a.value})`;
+            anomalyList.appendChild(li);
+          });
+        }
+        anomalyModal.classList.remove('hidden');
+      } catch (err) {
+        console.error('Anomaliyalar yüklənmədi:', err);
+      }
+    });
+
+    closeAnomalyModal.addEventListener('click', () => anomalyModal.classList.add('hidden'));
+    anomalyModal.addEventListener('click', (e) => { if (e.target === anomalyModal) anomalyModal.classList.add('hidden'); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') anomalyModal.classList.add('hidden'); });
+
+    fetchAgentDetails();
+  </script>
+</body>
+</html>

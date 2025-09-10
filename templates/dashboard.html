@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="az">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIEM Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .status-active { color: #10B981; }
+    .status-inactive { color: #EF4444; }
+    .status-pending { color: #F59E0B; }
+    /* subtle customizations for corporate look */
+    .card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)); }
+  </style>
+</head>
+
+<body class="bg-gray-900 text-gray-200 min-h-screen flex">
+  <!-- Sidebar -->
+  <aside class="w-72 bg-gray-800 border-r border-gray-700 p-6 hidden md:block">
+    <div class="flex items-center gap-3 mb-8">
+      <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 .943.657 1.722 1.529 1.93l1.764.44a2 2 0 01.707 3.502l-1.646 1.177a1.993 1.993 0 01-2.206.063l-1.636-.982a1.993 1.993 0 01-.95-1.707V12m0-1V9a2 2 0 012-2h0a2 2 0 012 2v2" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold text-white">FORAM Platforma</h3>
+        <p class="text-sm text-gray-400">Korporativ RAM Forensics</p>
+      </div>
+    </div>
+
+    <nav class="space-y-1 text-sm">
+      <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3z"/></svg>
+        Dashboard
+      </a>
+<a href="anomalies.html" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+  </svg>
+  Anomalies
+</a>
+    </nav>
+
+    <div class="mt-8 text-sm text-gray-400">
+      <p>© 2025 SIEM</p>
+      <p class="mt-2">Bütün hüquqlar qorunur.</p>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <div class="flex-1 p-6 overflow-auto">
+    <!-- Top bar -->
+    <header class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-extrabold text-white">Agent Dashboard</h1>
+        <p class="text-sm text-gray-400 mt-1">Sistemlərinizin real-vaxt SIEM görünüşü</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="text-sm text-gray-400 mr-4">Son yenilənmə: <span id="lastUpdated">—</span></div>
+        <button id="refreshButton" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md text-white font-medium">Yenilə</button>
+        <button id="exportCsv" class="px-4 py-2 border border-gray-700 rounded-md text-gray-300 hover:text-white">CSV ixrac</button>
+      </div>
+    </header>
+
+    <!-- Stats Row -->
+    <section id="stats" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="rounded-2xl p-5 shadow-lg bg-gray-800 card">
+        <h3 class="text-sm text-gray-400">Ümumi Agent Sayı</h3>
+        <div class="flex items-end justify-between mt-3">
+          <div>
+            <p id="totalAgentsCount" class="text-4xl font-bold text-white">0</p>
+            <p class="text-xs text-gray-400 mt-1">Online / Offline</p>
+          </div>
+          <div class="text-right">
+            <p class="text-sm text-gray-400">Critical Alerts</p>
+            <p id="criticalAlerts" class="text-2xl font-bold text-red-500">0</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl p-5 shadow-lg bg-gray-800 card">
+        <h3 class="text-sm text-gray-400">Son 24 Saatda Əlavə Olunanlar</h3>
+        <p id="newAgentsCount" class="text-4xl font-bold text-emerald-400 mt-3">0</p>
+        <p class="text-xs text-gray-400 mt-1">Yeni agentlər və qeydiyyatlar</p>
+      </div>
+
+      <div class="rounded-2xl p-5 shadow-lg bg-gray-800 card">
+        <h3 class="text-sm text-gray-400">Orta Ram İstifadəsi</h3>
+        <p id="avgRam" class="text-4xl font-bold text-blue-400 mt-3">—%</p>
+        <p class="text-xs text-gray-400 mt-1">Agentlər üzrə orta göstərici</p>
+      </div>
+    </section>
+
+    <!-- Filter & Search -->
+    <section class="bg-gray-800 rounded-2xl p-5 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <h2 class="text-lg font-semibold text-white">Agentləri Süzgəcdən Keçir</h2>
+
+      <div class="flex items-center gap-3 w-full md:w-auto">
+        <div class="relative">
+          <select id="osFilter" class="block bg-gray-900 border border-gray-700 text-gray-200 py-2 px-3 pr-8 rounded-md focus:outline-none">
+            <option value="all">Bütün ƏS</option>
+            <option value="Windows">Windows</option>
+            <option value="Linux">Linux</option>
+            <option value="MacOS">MacOS</option>
+          </select>
+        </div>
+
+        <div class="relative">
+          <select id="statusFilter" class="block bg-gray-900 border border-gray-700 text-gray-200 py-2 px-3 pr-8 rounded-md focus:outline-none">
+            <option value="all">Bütün Statuslar</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+
+        <input id="searchInput" type="text" placeholder="Ad və ya IP axtarın..." class="px-4 py-2 rounded-md bg-gray-900 border border-gray-700 text-gray-200 focus:outline-none w-full md:w-64" />
+      </div>
+    </section>
+
+    <!-- Loading / Error -->
+    <div id="loadingMessage" class="flex items-center justify-center h-28 bg-gray-800 rounded-2xl mb-6">
+      <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <span class="text-gray-300">Məlumatlar yüklənir...</span>
+    </div>
+
+    <!-- Table container -->
+    <div id="tableContainer" class="overflow-x-auto hidden mb-6">
+      <table id="agents" class="min-w-full bg-gray-800 rounded-2xl overflow-hidden">
+        <thead class="bg-gray-700 text-gray-200 sticky top-0">
+          <tr>
+            <th class="py-3 px-4 text-left text-sm font-semibold">Ad</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold">ƏS</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold">IP Ünvanı</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold">Status</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold">Son Görülmə</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold">RAM İstifadəsi</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold">CPU Nüvələri</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold">Əməliyyatlar</th>
+          </tr>
+        </thead>
+        <tbody id="agentTableBody" class="divide-y divide-gray-700">
+          <!-- JS will render rows here -->
+        </tbody>
+      </table>
+    </div>
+
+    <div id="errorMessage" class="hidden bg-red-900 text-red-200 p-4 rounded-2xl mb-6">
+      <p>Məlumatların yüklənməsində xəta baş verdi. Serveriniz işlədiyinə əmin olun.</p>
+    </div>
+
+    <!-- Incidents preview -->
+    <section id="incidents" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="rounded-2xl p-4 bg-gray-800 card shadow-lg">
+        <h3 class="text-sm text-gray-400">Son İnsidentlər</h3>
+        <ul id="recentIncidents" class="mt-3 text-sm text-gray-300 space-y-3">
+          <li>—</li>
+        </ul>
+      </div>
+
+      <div class="rounded-2xl p-4 bg-gray-800 card shadow-lg">
+        <h3 class="text-sm text-gray-400">Sistem Xülasəsi</h3>
+        <p class="text-sm text-gray-300 mt-3">Sistemdə cari vəziyyət və təkliflər burada göstəriləcək.</p>
+      </div>
+
+      <div class="rounded-2xl p-4 bg-gray-800 card shadow-lg">
+        <h3 class="text-sm text-gray-400">Əməliyyatlar</h3>
+        <div class="mt-3 space-y-2">
+          <button class="w-full px-3 py-2 bg-indigo-600 rounded-md text-white">Yeni İnsident Yarad</button>
+          <button class="w-full px-3 py-2 border border-gray-700 rounded-md text-gray-300">Axtarış Filtri Saxla</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal for Agent Info -->
+    <div id="infoModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
+      <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl p-6 relative text-gray-200">
+        <button id="closeModal" class="absolute top-3 right-3 text-gray-400 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <h2 id="modalAgentName" class="text-2xl font-bold mb-2">Agent</h2>
+        <div id="modalContent" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-300">
+          <p><strong>Agent ID:</strong> <span id="modalAgentId"></span></p>
+          <p><strong>ƏS:</strong> <span id="modalAgentOS"></span></p>
+          <p><strong>IP Ünvanı:</strong> <span id="modalAgentIP"></span></p>
+          <p><strong>Host Adı:</strong> <span id="modalAgentHostname"></span></p>
+          <p><strong>CPU Nüvələri:</strong> <span id="modalAgentCPUCores"></span></p>
+          <p><strong>Ümumi Yaddaş:</strong> <span id="modalAgentTotalMemory"></span></p>
+          <p><strong>Agent Versiyası:</strong> <span id="modalAgentVersion"></span></p>
+          <p><strong>Son Görülmə:</strong> <span id="modalAgentLastSeen"></span></p>
+        </div>
+        <div class="mt-5 flex justify-end gap-3">
+          <button id="modalCloseBtn" class="px-4 py-2 border border-gray-700 rounded-md">Bağla</button>
+          <a id="agentDetailsLink" href="#" class="px-4 py-2 bg-indigo-600 rounded-md text-white">Tam Detallar</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer small -->
+    <footer class="text-xs text-gray-500 mt-8">© 2025 SIEM. Bütün hüquqlar qorunur.</footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const loadingMessage = document.getElementById('loadingMessage');
+      const tableContainer = document.getElementById('tableContainer');
+      const errorMessage = document.getElementById('errorMessage');
+      const tbody = document.getElementById('agentTableBody');
+      const totalAgentsCountElem = document.getElementById('totalAgentsCount');
+      const newAgentsCountElem = document.getElementById('newAgentsCount');
+      const refreshButton = document.getElementById('refreshButton');
+      const osFilter = document.getElementById('osFilter');
+      const statusFilter = document.getElementById('statusFilter');
+      const searchInput = document.getElementById('searchInput');
+      const lastUpdated = document.getElementById('lastUpdated');
+      const exportCsv = document.getElementById('exportCsv');
+
+      const infoModal = document.getElementById('infoModal');
+      const closeModalBtn = document.getElementById('closeModal');
+      const modalAgentName = document.getElementById('modalAgentName');
+      const modalAgentId = document.getElementById('modalAgentId');
+      const modalAgentOS = document.getElementById('modalAgentOS');
+      const modalAgentIP = document.getElementById('modalAgentIP');
+      const modalAgentHostname = document.getElementById('modalAgentHostname');
+      const modalAgentCPUCores = document.getElementById('modalAgentCPUCores');
+      const modalAgentTotalMemory = document.getElementById('modalAgentTotalMemory');
+      const modalAgentVersion = document.getElementById('modalAgentVersion');
+      const modalAgentLastSeen = document.getElementById('modalAgentLastSeen');
+      const agentDetailsLink = document.getElementById('agentDetailsLink');
+      const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+      let allAgents = []; // To store all agents for client-side filtering
+
+      async function fetchAgents() {
+        loadingMessage.classList.remove('hidden');
+        tableContainer.classList.add('hidden');
+        errorMessage.classList.add('hidden');
+
+        try {
+          const response = await fetch('http://127.0.0.1:5000/api/agents');
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          allAgents = await response.json();
+
+          updateStats(allAgents);
+          filterAndRenderAgents();
+
+          loadingMessage.classList.add('hidden');
+          tableContainer.classList.remove('hidden');
+
+          lastUpdated.textContent = new Date().toLocaleString();
+
+        } catch (err) {
+          console.error('Agentlərin yüklənməsində xəta:', err);
+          loadingMessage.classList.add('hidden');
+          errorMessage.classList.remove('hidden');
+        }
+      }
+
+      function updateStats(agents) {
+        totalAgentsCountElem.textContent = agents.length;
+        const twentyFourHoursAgo = new Date();
+        twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
+        const newAgents = agents.filter(agent => new Date(agent.registeredAt) >= twentyFourHoursAgo);
+        newAgentsCountElem.textContent = newAgents.length;
+
+        // compute average RAM and critical alerts (basic placeholders)
+        let ramSum = 0;
+        let ramCount = 0;
+        let critical = 0;
+        agents.forEach(agent => {
+          const latest = agent.agentDataHistory?.[0] ?? {};
+          const ramPercent = latest.ramData?.percent;
+          if (typeof ramPercent === 'number') { ramSum += ramPercent; ramCount++; }
+          if (agent.alerts?.some(a => a.severity === 'critical')) critical++;
+        });
+        document.getElementById('avgRam').textContent = ramCount ? (ramSum / ramCount).toFixed(1) + '%' : '—%';
+        document.getElementById('criticalAlerts').textContent = critical;
+      }
+
+      function renderAgents(agentsToRender) {
+        tbody.innerHTML = '';
+
+        if (agentsToRender.length === 0) {
+          const row = document.createElement('tr');
+          row.innerHTML = `<td colspan="8" class="py-4 text-center text-gray-400">Heç bir agent tapılmadı.</td>`;
+          tbody.appendChild(row);
+          return;
+        }
+
+        agentsToRender.forEach(agent => {
+          const latestData = agent.agentDataHistory?.[0] || {};
+          const ramPercent = latestData.ramData?.percent ?? 'N/A';
+          const cpuCores = agent.systemInfo?.cpuCores ?? 'N/A';
+          const lastSeenDate = new Date(agent.lastSeen);
+          const formattedLastSeen = isNaN(lastSeenDate) ? 'N/A' : lastSeenDate.toLocaleString();
+
+          const row = document.createElement('tr');
+          row.classList.add('hover:bg-gray-700', 'transition-colors', 'duration-200');
+
+          row.innerHTML = `
+            <td class="py-3 px-4 text-sm whitespace-nowrap">${agent.name}</td>
+            <td class="py-3 px-4 text-sm whitespace-nowrap">${agent.os}</td>
+            <td class="py-3 px-4 text-sm whitespace-nowrap">${agent.ipAddress}</td>
+            <td class="py-3 px-4 text-sm font-medium whitespace-nowrap">
+              <span class="status-${agent.status}">${agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}</span>
+            </td>
+            <td class="py-3 px-4 text-sm whitespace-nowrap">${formattedLastSeen}</td>
+            <td class="py-3 px-4 text-sm whitespace-nowrap">${ramPercent !== 'N/A' ? Number(ramPercent).toFixed(1) + '%' : 'N/A'}</td>
+            <td class="py-3 px-4 text-sm whitespace-nowrap">${cpuCores}</td>
+            <td class="py-3 px-4 text-sm whitespace-nowrap space-x-2">
+              <button class="info-btn px-3 py-1 bg-gray-700 text-white text-sm font-semibold rounded-full hover:bg-gray-600 transition-colors" data-agent-id="${agent._id}">Info</button>
+              <a href="agent-detail.html?id=${agent._id}" class="px-3 py-1 bg-indigo-600 text-white text-sm font-semibold rounded-full hover:bg-indigo-700 transition-colors">Detallar</a>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+
+      function filterAndRenderAgents() {
+        const os = osFilter.value;
+        const status = statusFilter.value;
+        const searchTerm = searchInput.value.toLowerCase();
+
+        let filteredAgents = allAgents.filter(agent => {
+          if (os !== 'all' && agent.os !== os) return false;
+          if (status !== 'all' && agent.status !== status) return false;
+          if (searchTerm !== '' && !agent.name.toLowerCase().includes(searchTerm) && !agent.ipAddress.includes(searchTerm)) return false;
+          return true;
+        });
+
+        renderAgents(filteredAgents);
+      }
+
+      // Modal open
+      function openInfoModal(agentId) {
+        const agent = allAgents.find(a => a._id === agentId);
+        if (!agent) return;
+
+        modalAgentName.textContent = agent.name;
+        modalAgentId.textContent = agent._id;
+        modalAgentOS.textContent = agent.os;
+        modalAgentIP.textContent = agent.ipAddress;
+        modalAgentHostname.textContent = agent.systemInfo?.hostname ?? 'N/A';
+        modalAgentCPUCores.textContent = agent.systemInfo?.cpuCores ?? 'N/A';
+        modalAgentTotalMemory.textContent = agent.systemInfo?.totalMemory ? (agent.systemInfo.totalMemory / (1024 * 1024 * 1024)).toFixed(2) + ' GB' : 'N/A';
+        modalAgentVersion.textContent = agent.version ?? 'N/A';
+        modalAgentLastSeen.textContent = new Date(agent.lastSeen).toLocaleString();
+
+        agentDetailsLink.href = `agent-detail.html?id=${agent._id}`;
+        infoModal.classList.remove('hidden');
+      }
+
+      function closeInfoModal() { infoModal.classList.add('hidden'); }
+
+      // CSV export feature
+      function exportTableToCSV(filename = 'agents.csv') {
+        const rows = [];
+        const headers = ['Ad','ƏS','IP Ünvanı','Status','Son Görülmə','RAM İstifadəsi','CPU Nüvələri','Agent ID'];
+        rows.push(headers.join(','));
+
+        allAgents.forEach(agent => {
+          const latestData = agent.agentDataHistory?.[0] || {};
+          const ramPercent = latestData.ramData?.percent ?? '';
+          const cpuCores = agent.systemInfo?.cpuCores ?? '';
+          const lastSeen = agent.lastSeen ?? '';
+          const line = [agent.name, agent.os, agent.ipAddress, agent.status, lastSeen, ramPercent, cpuCores, agent._id].map(v => `"${String(v).replace(/"/g,'""')}"`).join(',');
+          rows.push(line);
+        });
+
+        const csvContent = rows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      fetchAgents();
+      // refresh every 30s
+      setInterval(fetchAgents, 30000);
+
+      refreshButton.addEventListener('click', fetchAgents);
+      osFilter.addEventListener('change', filterAndRenderAgents);
+      statusFilter.addEventListener('change', filterAndRenderAgents);
+      searchInput.addEventListener('input', filterAndRenderAgents);
+
+      // event delegation for info buttons
+      tbody.addEventListener('click', (event) => {
+        if (event.target.classList.contains('info-btn')) {
+          const agentId = event.target.getAttribute('data-agent-id');
+          openInfoModal(agentId);
+        }
+      });
+
+      closeModalBtn.addEventListener('click', closeInfoModal);
+      modalCloseBtn.addEventListener('click', closeInfoModal);
+      infoModal.addEventListener('click', (event) => { if (event.target === infoModal) closeInfoModal(); });
+
+      exportCsv.addEventListener('click', () => exportTableToCSV());
+
+      // keyboard accessibility: close modal on ESC
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeInfoModal(); });
+
+      // placeholder: recent incidents (if API provides) — safe fallback
+      const recentIncidentsElem = document.getElementById('recentIncidents');
+      recentIncidentsElem.innerHTML = '<li>İnfo: Agentlərdən 3 kritik xəbərdarlıq.</li><li>Warning: 7 şübhəli giriş cəhdləri.</li>';
+    });
+  </script>
+</body>
+
+</html>

